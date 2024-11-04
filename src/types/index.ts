@@ -53,22 +53,14 @@ export interface Milestone {
   description?: string;
 }
 
-export interface MindMap {
+export interface Reminder {
   id: number;
+  taskId: number;
   title: string;
-  nodes: MindMapNode[];
-  edges: MindMapEdge[];
-}
-
-export interface MindMapNode {
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-  type: 'root' | 'branch' | 'leaf';
-}
-
-export interface MindMapEdge {
-  source: string;
-  target: string;
+  description: string;
+  dueDate: string;
+  dueTime: string;
+  status: 'pending' | 'completed' | 'dismissed' | 'all';
+  priority: 'low' | 'medium' | 'high';
+  repeat?: 'daily' | 'weekly' | 'monthly' | 'none';
 }
