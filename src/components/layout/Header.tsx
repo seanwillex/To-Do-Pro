@@ -16,6 +16,11 @@ interface HeaderProps {
 
 export function Header({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm }: HeaderProps) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="border-b bg-background/80 backdrop-blur-sm fixed top-0 w-full z-50">
@@ -39,17 +44,19 @@ export function Header({ sidebarOpen, setSidebarOpen, searchTerm, setSearchTerm 
               className="pl-9 pr-4 py-2 w-full"
             />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+          )}
           <Avatar className="h-8 w-8">
             <AvatarImage src="/placeholder.svg" alt="User avatar" />
             <AvatarFallback>U</AvatarFallback>
