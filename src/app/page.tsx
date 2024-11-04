@@ -12,6 +12,8 @@ import { Task, Note } from '@/types';
 import { INITIAL_TASKS, INITIAL_NOTES } from '@/lib/constants';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ThemeProvider } from "@/components/theme-provider";
+import { Footer } from '@/components/layout/Footer';
+import { DocList } from '@/components/docs/DocList';
 
 export default function HomePage() {
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', INITIAL_TASKS);
@@ -49,7 +51,7 @@ export default function HomePage() {
       enableSystem
       disableTransitionOnChange
     >
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Header
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
@@ -57,7 +59,7 @@ export default function HomePage() {
           setSearchTerm={setSearchTerm}
         />
 
-        <div className="pt-14 flex">
+        <div className="pt-14 flex flex-1">
           <Sidebar 
             sidebarOpen={sidebarOpen} 
             activeTab={activeTab}
@@ -79,6 +81,9 @@ export default function HomePage() {
                     <TabsTrigger value="notes" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                       Notes
                     </TabsTrigger>
+                    <TabsTrigger value="docs" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                      Docs
+                    </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="tasks">
@@ -97,6 +102,14 @@ export default function HomePage() {
                       updateNoteContent={updateNoteContent}
                     />
                   </TabsContent>
+
+                  <TabsContent value="docs">
+                    <DocList
+                      docs={filteredDocs}
+                      setDocs={setDocs}
+                      updateDocContent={updateDocContent}
+                    />
+                  </TabsContent>
                 </Tabs>
               </div>
             </div>
@@ -109,6 +122,8 @@ export default function HomePage() {
             />
           )}
         </div>
+
+        <Footer />
       </div>
     </ThemeProvider>
   );

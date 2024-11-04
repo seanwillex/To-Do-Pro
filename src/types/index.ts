@@ -15,3 +15,11 @@ export interface Note {
   content: string;
   tag: string;
 }
+
+export interface Doc {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  lastUpdated: string;
+}
