@@ -27,10 +27,11 @@ export interface Doc {
 export interface TimeEntry {
   id: number;
   taskId: number;
+  title: string;
   startTime: string;
   endTime?: string;
-  duration: number; // in minutes
-  description?: string;
+  duration: number;
+  description: string;
 }
 
 export interface Goal {

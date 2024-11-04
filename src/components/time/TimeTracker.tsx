@@ -38,9 +38,11 @@ export function TimeTracker({ task, onTimeEntry }: TimeTrackerProps) {
         onTimeEntry({
           id: Date.now(),
           taskId: task.id,
+          title: task.title,
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
           duration,
+          description: `Time tracked for task: ${task.title}`
         });
       }
       setStartTime(null);
