@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Task, Note } from '@/types';
 import { INITIAL_TASKS, INITIAL_NOTES } from '@/lib/constants';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function HomePage() {
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', INITIAL_TASKS);
@@ -18,6 +19,7 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [activeTab, setActiveTab] = useState('tasks');
 
   const filteredTasks = tasks.filter((task: Task) =>
     task.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -41,60 +43,73 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <Header
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-      />
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <div className="min-h-screen bg-background">
+        <Header
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
 
-      <div className="pt-14 flex">
-        <Sidebar sidebarOpen={sidebarOpen} />
-
-        <main className={`flex-1 transition-all duration-200 ease-in-out ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
-          <div className="p-6 max-w-6xl mx-auto">
-            <TaskStats tasks={tasks} />
-            
-            <div className="mt-8">
-              <Tabs defaultValue="tasks" className="w-full">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="tasks" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                    Tasks
-                  </TabsTrigger>
-                  <TabsTrigger value="notes" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                    Notes
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="tasks">
-                  <TaskList
-                    tasks={filteredTasks}
-                    setTasks={setTasks}
-                    updateTaskTag={updateTaskTag}
-                    setSelectedTask={setSelectedTask}
-                  />
-                </TabsContent>
-
-                <TabsContent value="notes">
-                  <NoteList
-                    notes={filteredNotes}
-                    setNotes={setNotes}
-                    updateNoteContent={updateNoteContent}
-                  />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </main>
-
-        {selectedTask && (
-          <TaskDetails
-            task={selectedTask}
-            onClose={() => setSelectedTask(null)}
+        <div className="pt-14 flex">
+          <Sidebar 
+            sidebarOpen={sidebarOpen} 
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setActiveTab(tab);
+            }}
           />
-        )}
+
+          <main className={`flex-1 transition-all duration-200 ease-in-out ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
+            <div className="p-6 max-w-6xl mx-auto">
+              <TaskStats tasks={tasks} />
+              
+              <div className="mt-8">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="tasks" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                      Tasks
+                    </TabsTrigger>
+                    <TabsTrigger value="notes" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                      Notes
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="tasks">
+                    <TaskList
+                      tasks={filteredTasks}
+                      setTasks={setTasks}
+                      updateTaskTag={updateTaskTag}
+                      setSelectedTask={setSelectedTask}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="notes">
+                    <NoteList
+                      notes={filteredNotes}
+                      setNotes={setNotes}
+                      updateNoteContent={updateNoteContent}
+                    />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </div>
+          </main>
+
+          {selectedTask && (
+            <TaskDetails
+              task={selectedTask}
+              onClose={() => setSelectedTask(null)}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 } 
