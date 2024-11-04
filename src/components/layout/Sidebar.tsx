@@ -3,13 +3,13 @@
 import * as React from 'react';
 import { Button } from "@/components/ui/button";
 import { 
+  LayoutDashboard, 
   CheckCircle2, 
   FileText, 
   Book, 
   Clock, 
   Target, 
   Flag, 
-  GitMerge,
   Network 
 } from 'lucide-react';
 
@@ -19,14 +19,14 @@ interface SidebarProps {
   onTabChange: (tab: string) => void;
 }
 
-export function Sidebar({ sidebarOpen, activeTab = 'tasks', onTabChange }: SidebarProps) {
+export function Sidebar({ sidebarOpen, activeTab = 'dashboard', onTabChange }: SidebarProps) {
   const menuItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'tasks', icon: CheckCircle2, label: 'Tasks' },
     { id: 'notes', icon: FileText, label: 'Notes' },
     { id: 'docs', icon: Book, label: 'Docs' },
     { id: 'time', icon: Clock, label: 'Time Tracking' },
     { id: 'goals', icon: Target, label: 'Goals' },
-    { id: 'milestones', icon: Flag, label: 'Milestones' },
     { id: 'mindmaps', icon: Network, label: 'Mind Maps' },
   ];
 

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Task, TimeEntry } from '@/types';
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui";
-import { TimeTracker } from './TimeTracker';
+import { TimeTracker } from '@/components/time/TimeTracker';
 import { format, differenceInMinutes } from 'date-fns';
 
 interface TimeTrackingViewProps {

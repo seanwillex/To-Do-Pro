@@ -16,6 +16,7 @@ import { DocList } from '@/components/docs/DocList';
 import { MindMapList } from '@/components/mindmaps/MindMapList';
 import { GoalList } from '@/components/goals/GoalList';
 import { TimeTrackingView } from '@/components/time/TimeTrackingView';
+import { Dashboard } from '@/components/dashboard/Dashboard';
 
 const INITIAL_DOCS: Doc[] = [
   {
@@ -183,6 +184,9 @@ export default function HomePage() {
             <div className="mt-8">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="mb-4">
+                  <TabsTrigger value="dashboard" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                    Dashboard
+                  </TabsTrigger>
                   <TabsTrigger value="tasks" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                     Tasks
                   </TabsTrigger>
@@ -202,6 +206,14 @@ export default function HomePage() {
                     Time Tracking
                   </TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="dashboard">
+                  <Dashboard
+                    tasks={tasks}
+                    notes={notes}
+                    timeEntries={timeEntries}
+                  />
+                </TabsContent>
 
                 <TabsContent value="tasks">
                   <TaskList
