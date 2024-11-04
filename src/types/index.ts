@@ -1,9 +1,11 @@
+export type TaskTag = 'urgent' | 'in-progress' | 'completed' | 'pending';
+
 export interface Task {
   id: number;
   title: string;
   completed: boolean;
   dueDate: string;
-  tag: 'urgent' | 'in-progress' | 'completed' | 'pending';
+  tag: TaskTag;
   description: string;
 }
 
@@ -13,7 +15,3 @@ export interface Note {
   content: string;
   tag: string;
 }
-
-export type TaskTag = {
-  [key: string]: string;
-} 

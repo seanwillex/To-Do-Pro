@@ -1,4 +1,6 @@
-export const TASK_TAGS = {
+import { TaskTag } from '@/types';
+
+export const TASK_TAGS: Record<TaskTag, string> = {
   'urgent': 'bg-red-500',
   'in-progress': 'bg-yellow-500',
   'completed': 'bg-green-500',
@@ -11,7 +13,7 @@ export const INITIAL_TASKS = [
     title: 'Design new landing page', 
     completed: false, 
     dueDate: '2024-02-15',
-    tag: 'in-progress',
+    tag: 'in-progress' as TaskTag,
     description: 'Create a modern and engaging landing page design'
   },
   { 
@@ -19,7 +21,7 @@ export const INITIAL_TASKS = [
     title: 'Update user documentation', 
     completed: true, 
     dueDate: '2024-02-10',
-    tag: 'completed',
+    tag: 'completed' as TaskTag,
     description: 'Review and update all user-facing documentation'
   },
   { 
@@ -27,10 +29,10 @@ export const INITIAL_TASKS = [
     title: 'Fix authentication bugs', 
     completed: false, 
     dueDate: '2024-02-20',
-    tag: 'urgent',
+    tag: 'urgent' as TaskTag,
     description: 'Address reported authentication issues'
   },
-] as const;
+];
 
 export const INITIAL_NOTES = [
   { 
@@ -45,4 +47,4 @@ export const INITIAL_NOTES = [
     content: '<p>Requirements gathering for new features:</p><ol><li>User authentication</li><li>Dashboard redesign</li></ol>',
     tag: 'project'
   },
-] as const; 
+]; 

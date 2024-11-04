@@ -4,15 +4,17 @@ import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TaskList } from '@/components/tasks/TaskList';
+import { TaskStats } from '@/components/tasks/TaskStats';
 import { NoteList } from '@/components/notes/NoteList';
 import { TaskDetails } from '@/components/tasks/TaskDetails';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Task, Note } from '@/types';
 import { INITIAL_TASKS, INITIAL_NOTES } from '@/lib/constants';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export default function HomePage() {
-  const [tasks, setTasks] = useState<Task[]>([...INITIAL_TASKS]);
-  const [notes, setNotes] = useState<Note[]>([...INITIAL_NOTES]);
+  const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', INITIAL_TASKS);
+  const [notes, setNotes] = useLocalStorage<Note[]>('notes', INITIAL_NOTES);
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -52,33 +54,37 @@ export default function HomePage() {
 
         <main className={`flex-1 transition-all duration-200 ease-in-out ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
           <div className="p-6 max-w-6xl mx-auto">
-            <Tabs defaultValue="tasks" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="tasks" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                  Tasks
-                </TabsTrigger>
-                <TabsTrigger value="notes" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                  Notes
-                </TabsTrigger>
-              </TabsList>
+            <TaskStats tasks={tasks} />
+            
+            <div className="mt-8">
+              <Tabs defaultValue="tasks" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="tasks" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                    Tasks
+                  </TabsTrigger>
+                  <TabsTrigger value="notes" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                    Notes
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="tasks">
-                <TaskList
-                  tasks={filteredTasks}
-                  setTasks={setTasks}
-                  updateTaskTag={updateTaskTag}
-                  setSelectedTask={setSelectedTask}
-                />
-              </TabsContent>
+                <TabsContent value="tasks">
+                  <TaskList
+                    tasks={filteredTasks}
+                    setTasks={setTasks}
+                    updateTaskTag={updateTaskTag}
+                    setSelectedTask={setSelectedTask}
+                  />
+                </TabsContent>
 
-              <TabsContent value="notes">
-                <NoteList
-                  notes={filteredNotes}
-                  setNotes={setNotes}
-                  updateNoteContent={updateNoteContent}
-                />
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="notes">
+                  <NoteList
+                    notes={filteredNotes}
+                    setNotes={setNotes}
+                    updateNoteContent={updateNoteContent}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
         </main>
 
