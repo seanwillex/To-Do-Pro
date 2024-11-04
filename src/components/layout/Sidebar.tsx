@@ -9,8 +9,7 @@ import {
   Book, 
   Clock, 
   Target, 
-  Flag, 
-  Network 
+  Bell, 
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -27,7 +26,7 @@ export function Sidebar({ sidebarOpen, activeTab = 'dashboard', onTabChange }: S
     { id: 'docs', icon: Book, label: 'Docs' },
     { id: 'time', icon: Clock, label: 'Time Tracking' },
     { id: 'goals', icon: Target, label: 'Goals' },
-    { id: 'mindmaps', icon: Network, label: 'Mind Maps' },
+    { id: 'reminders', icon: Bell, label: 'Reminders' },
   ];
 
   return (
