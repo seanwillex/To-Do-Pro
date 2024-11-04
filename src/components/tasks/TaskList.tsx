@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Task } from '@/types';
 import { AddItemForm } from '@/components/shared/AddItemForm';
 import { SortableTask } from './SortableTask';
+import { TaskFilters } from './TaskFilters';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -16,6 +17,10 @@ interface TaskListProps {
 }
 
 export function TaskList({ tasks, setTasks, updateTaskTag, setSelectedTask }: TaskListProps) {
+  const [filter, setFilter] = React.useState<Task['tag'] | 'all'>('all');
+  const [sortBy, setSortBy] = React.useState<'dueDate' | 'title' | 'status'>('dueDate');
+  const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -34,6 +39,34 @@ export function TaskList({ tasks, setTasks, updateTaskTag, setSelectedTask }: Ta
     }
   };
 
+  const filteredAndSortedTasks = React.useMemo(() => {
+    let result = [...tasks];
+    
+    // Apply filter
+    if (filter !== 'all') {
+      result = result.filter(task => task.tag === filter);
+    }
+    
+    // Apply sort
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case 'dueDate':
+          comparison = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+          break;
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'status':
+          comparison = a.tag.localeCompare(b.tag);
+          break;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+    
+    return result;
+  }, [tasks, filter, sortBy, sortDirection]);
+
   const addTask = (title: string) => {
     const newTask: Task = {
       id: Date.now(),
@@ -43,7 +76,13 @@ export function TaskList({ tasks, setTasks, updateTaskTag, setSelectedTask }: Ta
       tag: 'pending',
       description: ''
     };
-    setTasks((prev: Task[]) => [...prev, newTask]);
+    setTasks(prev => [...prev, newTask]);
+  };
+
+  const handleComplete = (taskId: number, completed: boolean) => {
+    setTasks(prev => prev.map(task => 
+      task.id === taskId ? { ...task, completed } : task
+    ));
   };
 
   return (
@@ -51,18 +90,27 @@ export function TaskList({ tasks, setTasks, updateTaskTag, setSelectedTask }: Ta
       <div className="mb-4">
         <AddItemForm onAdd={addTask} placeholder="Add a new task..." />
       </div>
+      
+      <TaskFilters
+        onFilterChange={setFilter}
+        onSortChange={setSortBy}
+        onSortDirectionChange={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+        sortDirection={sortDirection}
+      />
+
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
+        <SortableContext items={filteredAndSortedTasks} strategy={verticalListSortingStrategy}>
           <div className="space-y-2">
-            {tasks.map(task => (
+            {filteredAndSortedTasks.map(task => (
               <SortableTask
                 key={task.id}
                 task={task}
                 updateTag={updateTaskTag}
+                onComplete={handleComplete}
                 onClick={() => setSelectedTask(task)}
               />
             ))}

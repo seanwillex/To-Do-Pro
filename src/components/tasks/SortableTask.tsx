@@ -18,10 +18,11 @@ import {
 interface SortableTaskProps {
   task: Task;
   updateTag: (id: number, tag: Task['tag']) => void;
+  onComplete: (taskId: number, completed: boolean) => void;
   onClick: () => void;
 }
 
-export function SortableTask({ task, updateTag, onClick }: SortableTaskProps) {
+export function SortableTask({ task, updateTag, onComplete, onClick }: SortableTaskProps) {
   const {
     attributes,
     listeners,
