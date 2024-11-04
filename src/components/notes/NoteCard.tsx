@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import { Note } from '@/types';
-import { Badge } from '@/components/ui/badge';
 import { 
+  Badge,
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/components/ui";
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 

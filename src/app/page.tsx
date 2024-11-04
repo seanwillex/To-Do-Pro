@@ -8,16 +8,34 @@ import { TaskStats } from '@/components/tasks/TaskStats';
 import { NoteList } from '@/components/notes/NoteList';
 import { TaskDetails } from '@/components/tasks/TaskDetails';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Task, Note } from '@/types';
+import { Task, Note, Doc } from '@/types';
 import { INITIAL_TASKS, INITIAL_NOTES } from '@/lib/constants';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ThemeProvider } from "@/components/theme-provider";
 import { Footer } from '@/components/layout/Footer';
 import { DocList } from '@/components/docs/DocList';
 
+const INITIAL_DOCS: Doc[] = [
+  {
+    id: 1,
+    title: 'Getting Started Guide',
+    content: '<h2>Welcome to To-do Pro</h2><p>This guide will help you get started...</p>',
+    category: 'guide',
+    lastUpdated: new Date().toISOString()
+  },
+  {
+    id: 2,
+    title: 'Project Documentation',
+    content: '<h2>Project Overview</h2><p>Key project details and guidelines...</p>',
+    category: 'documentation',
+    lastUpdated: new Date().toISOString()
+  }
+];
+
 export default function HomePage() {
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', INITIAL_TASKS);
   const [notes, setNotes] = useLocalStorage<Note[]>('notes', INITIAL_NOTES);
+  const [docs, setDocs] = useLocalStorage<Doc[]>('docs', INITIAL_DOCS);
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -32,6 +50,11 @@ export default function HomePage() {
     note.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredDocs = docs.filter((doc: Doc) =>
+    doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doc.content.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const updateTaskTag = (id: number, tag: Task['tag']) => {
     setTasks(tasks.map((task: Task) =>
       task.id === id ? { ...task, tag } : task
@@ -41,6 +64,12 @@ export default function HomePage() {
   const updateNoteContent = (id: number, content: string) => {
     setNotes(notes.map((note: Note) =>
       note.id === id ? { ...note, content } : note
+    ));
+  };
+
+  const updateDocContent = (id: number, content: string) => {
+    setDocs(docs.map((doc: Doc) =>
+      doc.id === id ? { ...doc, content, lastUpdated: new Date().toISOString() } : doc
     ));
   };
 

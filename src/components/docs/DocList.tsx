@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Doc } from '@/types';
 import { AddItemForm } from '@/components/shared/AddItemForm';
-import { DocCard } from './DocCard';
+import { DocCard } from '@/components/docs/DocCard';
 
 interface DocListProps {
   docs: Doc[];
