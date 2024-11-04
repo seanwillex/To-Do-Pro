@@ -8,15 +8,15 @@ import { TaskStats } from '@/components/tasks/TaskStats';
 import { NoteList } from '@/components/notes/NoteList';
 import { TaskDetails } from '@/components/tasks/TaskDetails';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Task, Note, Doc, MindMap, Goal, TimeEntry } from '@/types';
+import { Task, Note, Doc, Goal, TimeEntry, Reminder } from '@/types';
 import { INITIAL_TASKS, INITIAL_NOTES } from '@/lib/constants';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Footer } from '@/components/layout/Footer';
 import { DocList } from '@/components/docs/DocList';
-import { MindMapList } from '@/components/mindmaps/MindMapList';
 import { GoalList } from '@/components/goals/GoalList';
 import { TimeTrackingView } from '@/components/time/TimeTrackingView';
 import { Dashboard } from '@/components/dashboard/Dashboard';
+import { ReminderList } from '@/components/reminders/ReminderList';
 
 const INITIAL_DOCS: Doc[] = [
   {
@@ -32,24 +32,6 @@ const INITIAL_DOCS: Doc[] = [
     content: '<h2>Project Overview</h2><p>Key project details and guidelines...</p>',
     category: 'documentation',
     lastUpdated: new Date().toISOString()
-  }
-];
-
-const INITIAL_MINDMAPS: MindMap[] = [
-  {
-    id: 1,
-    title: 'Project Overview',
-    nodes: [
-      { id: 'root', label: 'Project', x: 400, y: 300, type: 'root' },
-      { id: 'n1', label: 'Features', x: 200, y: 200, type: 'branch' },
-      { id: 'n2', label: 'Timeline', x: 600, y: 200, type: 'branch' },
-      { id: 'n3', label: 'Resources', x: 400, y: 500, type: 'branch' },
-    ],
-    edges: [
-      { source: 'root', target: 'n1' },
-      { source: 'root', target: 'n2' },
-      { source: 'root', target: 'n3' },
-    ]
   }
 ];
 
@@ -84,13 +66,27 @@ const INITIAL_GOALS = [
 
 const INITIAL_TIME_ENTRIES: TimeEntry[] = [];
 
+const INITIAL_REMINDERS: Reminder[] = [
+  {
+    id: 1,
+    taskId: 1,
+    title: 'Project Meeting',
+    description: 'Team sync-up for project status',
+    dueDate: '2024-02-15',
+    dueTime: '10:00',
+    status: 'pending',
+    priority: 'high',
+    repeat: 'weekly'
+  }
+];
+
 export default function HomePage() {
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', INITIAL_TASKS);
   const [notes, setNotes] = useLocalStorage<Note[]>('notes', INITIAL_NOTES);
   const [docs, setDocs] = useLocalStorage<Doc[]>('docs', INITIAL_DOCS);
-  const [mindMaps, setMindMaps] = useLocalStorage<MindMap[]>('mindmaps', INITIAL_MINDMAPS);
   const [goals, setGoals] = useLocalStorage<Goal[]>('goals', INITIAL_GOALS);
   const [timeEntries, setTimeEntries] = useLocalStorage<TimeEntry[]>('time-entries', INITIAL_TIME_ENTRIES);
+  const [reminders, setReminders] = useLocalStorage<Reminder[]>('reminders', INITIAL_REMINDERS);
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -110,12 +106,6 @@ export default function HomePage() {
     doc.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredMindMaps = mindMaps.filter((mindMap: MindMap) =>
-    mindMap.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mindMap.nodes.some(node => node.label.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    mindMap.edges.some(edge => edge.source.toLowerCase().includes(searchTerm.toLowerCase()) || edge.target.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
   const filteredGoals = goals.filter((goal: Goal) =>
     goal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     goal.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -123,6 +113,11 @@ export default function HomePage() {
 
   const filteredTimeEntries = timeEntries.filter((entry: TimeEntry) =>
     entry.description.includes(searchTerm.toLowerCase())
+  );
+
+  const filteredReminders = reminders.filter((reminder: Reminder) =>
+    reminder.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    reminder.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const updateTaskTag = (id: number, tag: Task['tag']) => {
@@ -143,12 +138,6 @@ export default function HomePage() {
     ));
   };
 
-  const updateMindMap = (id: number, updates: Partial<MindMap>) => {
-    setMindMaps(mindMaps.map(mm =>
-      mm.id === id ? { ...mm, ...updates } : mm
-    ));
-  };
-
   const updateGoal = (id: number, updates: Partial<Goal>) => {
     setGoals(goals.map(goal =>
       goal.id === id ? { ...goal, ...updates } : goal
@@ -157,6 +146,12 @@ export default function HomePage() {
 
   const addTimeEntry = (entry: TimeEntry) => {
     setTimeEntries(prev => [...prev, entry]);
+  };
+
+  const updateReminder = (id: number, updates: Partial<Reminder>) => {
+    setReminders(reminders.map(reminder =>
+      reminder.id === id ? { ...reminder, ...updates } : reminder
+    ));
   };
 
   return (
@@ -196,14 +191,14 @@ export default function HomePage() {
                   <TabsTrigger value="docs" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                     Docs
                   </TabsTrigger>
-                  <TabsTrigger value="mindmaps" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                    Mind Maps
-                  </TabsTrigger>
                   <TabsTrigger value="goals" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                     Goals
                   </TabsTrigger>
                   <TabsTrigger value="time" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                     Time Tracking
+                  </TabsTrigger>
+                  <TabsTrigger value="reminders" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                    Reminders
                   </TabsTrigger>
                 </TabsList>
 
@@ -240,14 +235,6 @@ export default function HomePage() {
                   />
                 </TabsContent>
 
-                <TabsContent value="mindmaps">
-                  <MindMapList
-                    mindMaps={filteredMindMaps}
-                    setMindMaps={setMindMaps}
-                    updateMindMap={updateMindMap}
-                  />
-                </TabsContent>
-
                 <TabsContent value="goals">
                   <GoalList
                     goals={goals}
@@ -261,6 +248,15 @@ export default function HomePage() {
                     tasks={tasks}
                     timeEntries={timeEntries}
                     onTimeEntry={addTimeEntry}
+                  />
+                </TabsContent>
+
+                <TabsContent value="reminders">
+                  <ReminderList
+                    reminders={filteredReminders}
+                    tasks={tasks}
+                    setReminders={setReminders}
+                    updateReminder={updateReminder}
                   />
                 </TabsContent>
               </Tabs>
