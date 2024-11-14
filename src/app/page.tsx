@@ -8,63 +8,28 @@ import { TaskStats } from '@/components/tasks/TaskStats';
 import { NoteList } from '@/components/notes/NoteList';
 import { TaskDetails } from '@/components/tasks/TaskDetails';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Task, Note, Doc, Goal, TimeEntry, Reminder } from '@/types';
-import { INITIAL_TASKS, INITIAL_NOTES } from '@/lib/constants';
+import { Task, Note, Doc, Goal, TimeEntry, Reminder, Habit, Reflection, Resource, TaskCategory } from '@/types';
+import { 
+  INITIAL_TASKS, 
+  INITIAL_NOTES, 
+  INITIAL_DOCS, 
+  INITIAL_GOALS,
+  INITIAL_HABITS,
+  INITIAL_REFLECTIONS,
+  INITIAL_RESOURCES
+} from '@/lib/constants';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Footer } from '@/components/layout/Footer';
 import { DocList } from '@/components/docs/DocList';
 import { GoalList } from '@/components/goals/GoalList';
 import { TimeTrackingView } from '@/components/time/TimeTrackingView';
+import { PersonalDevDashboard } from '@/components/personal-development/dashboard/PersonalDevDashboard';
+import { HabitList } from '@/components/personal-development/habits/HabitList';
+import { ReflectionList } from '@/components/personal-development/reflection/ReflectionList';
+import { ResourceLibrary } from '@/components/personal-development/learning/ResourceLibrary';
+import { WellnessTracker } from '@/components/personal-development/wellness/WellnessTracker';
 import { Dashboard } from '@/components/dashboard/Dashboard';
 import { ReminderList } from '@/components/reminders/ReminderList';
-
-const INITIAL_DOCS: Doc[] = [
-  {
-    id: 1,
-    title: 'Getting Started Guide',
-    content: '<h2>Welcome to To-do Pro</h2><p>This guide will help you get started...</p>',
-    category: 'guide',
-    lastUpdated: new Date().toISOString()
-  },
-  {
-    id: 2,
-    title: 'Project Documentation',
-    content: '<h2>Project Overview</h2><p>Key project details and guidelines...</p>',
-    category: 'documentation',
-    lastUpdated: new Date().toISOString()
-  }
-];
-
-const INITIAL_GOALS = [
-  {
-    id: 1,
-    title: 'Complete Project MVP',
-    description: 'Deliver the minimum viable product with core features',
-    deadline: '2024-03-31',
-    progress: 60,
-    status: 'in-progress' as const,
-    milestones: [
-      {
-        id: 1,
-        goalId: 1,
-        title: 'Design Phase',
-        dueDate: '2024-02-28',
-        completed: true,
-        description: 'Complete UI/UX design'
-      },
-      {
-        id: 2,
-        goalId: 1,
-        title: 'Development Phase',
-        dueDate: '2024-03-15',
-        completed: false,
-        description: 'Implement core features'
-      }
-    ]
-  }
-];
-
-const INITIAL_TIME_ENTRIES: TimeEntry[] = [];
 
 const INITIAL_REMINDERS: Reminder[] = [
   {
@@ -85,55 +50,51 @@ export default function HomePage() {
   const [notes, setNotes] = useLocalStorage<Note[]>('notes', INITIAL_NOTES);
   const [docs, setDocs] = useLocalStorage<Doc[]>('docs', INITIAL_DOCS);
   const [goals, setGoals] = useLocalStorage<Goal[]>('goals', INITIAL_GOALS);
-  const [timeEntries, setTimeEntries] = useLocalStorage<TimeEntry[]>('time-entries', INITIAL_TIME_ENTRIES);
+  const [habits, setHabits] = useLocalStorage<Habit[]>('habits', INITIAL_HABITS);
+  const [reflections, setReflections] = useLocalStorage<Reflection[]>('reflections', INITIAL_REFLECTIONS);
+  const [resources, setResources] = useLocalStorage<Resource[]>('resources', INITIAL_RESOURCES);
+  const [timeEntries, setTimeEntries] = useLocalStorage<TimeEntry[]>('time-entries', []);
   const [reminders, setReminders] = useLocalStorage<Reminder[]>('reminders', INITIAL_REMINDERS);
   const [searchTerm, setSearchTerm] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [activeTab, setActiveTab] = useState('tasks');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
-  const filteredTasks = tasks.filter((task: Task) =>
-    task.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filterBySearchTerm = <T extends { title: string }>(items: T[]): T[] => {
+    return items.filter(item =>
+      item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
 
-  const filteredNotes = notes.filter((note: Note) =>
-    note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    note.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredDocs = docs.filter((doc: Doc) =>
-    doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredGoals = goals.filter((goal: Goal) =>
-    goal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    goal.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredTimeEntries = timeEntries.filter((entry: TimeEntry) =>
-    entry.description.includes(searchTerm.toLowerCase())
-  );
-
-  const filteredReminders = reminders.filter((reminder: Reminder) =>
-    reminder.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reminder.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTasks = filterBySearchTerm(tasks);
+  const filteredNotes = filterBySearchTerm(notes);
+  const filteredDocs = filterBySearchTerm(docs);
+  const filteredGoals = filterBySearchTerm(goals);
+  const filteredHabits = filterBySearchTerm(habits);
+  const filteredReflections = filterBySearchTerm(reflections);
+  const filteredResources = filterBySearchTerm(resources);
+  const filteredReminders = filterBySearchTerm(reminders);
 
   const updateTaskTag = (id: number, tag: Task['tag']) => {
-    setTasks(tasks.map((task: Task) =>
+    setTasks(tasks.map(task =>
       task.id === id ? { ...task, tag } : task
     ));
   };
 
+  const updateTaskCategory = (id: number, category: TaskCategory) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, category } : task
+    ));
+  };
+
   const updateNoteContent = (id: number, content: string) => {
-    setNotes(notes.map((note: Note) =>
+    setNotes(notes.map(note =>
       note.id === id ? { ...note, content } : note
     ));
   };
 
   const updateDocContent = (id: number, content: string) => {
-    setDocs(docs.map((doc: Doc) =>
+    setDocs(docs.map(doc =>
       doc.id === id ? { ...doc, content, lastUpdated: new Date().toISOString() } : doc
     ));
   };
@@ -144,8 +105,22 @@ export default function HomePage() {
     ));
   };
 
-  const addTimeEntry = (entry: TimeEntry) => {
-    setTimeEntries(prev => [...prev, entry]);
+  const updateHabit = (id: number, updates: Partial<Habit>) => {
+    setHabits(habits.map(habit =>
+      habit.id === id ? { ...habit, ...updates } : habit
+    ));
+  };
+
+  const updateReflection = (id: number, updates: Partial<Reflection>) => {
+    setReflections(reflections.map(reflection =>
+      reflection.id === id ? { ...reflection, ...updates } : reflection
+    ));
+  };
+
+  const updateResource = (id: number, updates: Partial<Resource>) => {
+    setResources(resources.map(resource =>
+      resource.id === id ? { ...resource, ...updates } : resource
+    ));
   };
 
   const updateReminder = (id: number, updates: Partial<Reminder>) => {
@@ -167,9 +142,7 @@ export default function HomePage() {
         <Sidebar 
           sidebarOpen={sidebarOpen} 
           activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab);
-          }}
+          onTabChange={setActiveTab}
         />
 
         <main className={`flex-1 transition-all duration-200 ease-in-out ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
@@ -179,25 +152,37 @@ export default function HomePage() {
             <div className="mt-8">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="mb-4">
-                  <TabsTrigger value="dashboard" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <TabsTrigger value="dashboard">
                     Dashboard
                   </TabsTrigger>
-                  <TabsTrigger value="tasks" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <TabsTrigger value="personal-dev">
+                    Personal Growth
+                  </TabsTrigger>
+                  <TabsTrigger value="tasks">
                     Tasks
                   </TabsTrigger>
-                  <TabsTrigger value="notes" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <TabsTrigger value="habits">
+                    Habits
+                  </TabsTrigger>
+                  <TabsTrigger value="reflection">
+                    Reflection
+                  </TabsTrigger>
+                  <TabsTrigger value="learning">
+                    Learning
+                  </TabsTrigger>
+                  <TabsTrigger value="wellness">
+                    Wellness
+                  </TabsTrigger>
+                  <TabsTrigger value="notes">
                     Notes
                   </TabsTrigger>
-                  <TabsTrigger value="docs" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                    Docs
-                  </TabsTrigger>
-                  <TabsTrigger value="goals" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <TabsTrigger value="goals">
                     Goals
                   </TabsTrigger>
-                  <TabsTrigger value="time" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                    Time Tracking
+                  <TabsTrigger value="time">
+                    Time
                   </TabsTrigger>
-                  <TabsTrigger value="reminders" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <TabsTrigger value="reminders">
                     Reminders
                   </TabsTrigger>
                 </TabsList>
@@ -206,6 +191,16 @@ export default function HomePage() {
                   <Dashboard
                     tasks={tasks}
                     notes={notes}
+                    timeEntries={timeEntries}
+                  />
+                </TabsContent>
+
+                <TabsContent value="personal-dev">
+                  <PersonalDevDashboard
+                    tasks={tasks}
+                    goals={goals}
+                    habits={habits}
+                    reflections={reflections}
                     timeEntries={timeEntries}
                   />
                 </TabsContent>
@@ -219,6 +214,38 @@ export default function HomePage() {
                   />
                 </TabsContent>
 
+                <TabsContent value="habits">
+                  <HabitList
+                    habits={filteredHabits}
+                    setHabits={setHabits}
+                    updateHabit={updateHabit}
+                  />
+                </TabsContent>
+
+                <TabsContent value="reflection">
+                  <ReflectionList
+                    reflections={filteredReflections}
+                    setReflections={setReflections}
+                    updateReflection={updateReflection}
+                  />
+                </TabsContent>
+
+                <TabsContent value="learning">
+                  <ResourceLibrary
+                    resources={filteredResources}
+                    setResources={setResources}
+                    updateResource={updateResource}
+                  />
+                </TabsContent>
+
+                <TabsContent value="wellness">
+                  <WellnessTracker
+                    tasks={tasks}
+                    habits={habits}
+                    timeEntries={timeEntries}
+                  />
+                </TabsContent>
+
                 <TabsContent value="notes">
                   <NoteList
                     notes={filteredNotes}
@@ -227,17 +254,9 @@ export default function HomePage() {
                   />
                 </TabsContent>
 
-                <TabsContent value="docs">
-                  <DocList
-                    docs={filteredDocs}
-                    setDocs={setDocs}
-                    updateDocContent={updateDocContent}
-                  />
-                </TabsContent>
-
                 <TabsContent value="goals">
                   <GoalList
-                    goals={goals}
+                    goals={filteredGoals}
                     setGoals={setGoals}
                     updateGoal={updateGoal}
                   />
@@ -247,7 +266,7 @@ export default function HomePage() {
                   <TimeTrackingView
                     tasks={tasks}
                     timeEntries={timeEntries}
-                    onTimeEntry={addTimeEntry}
+                    onTimeEntry={(entry) => setTimeEntries(prev => [...prev, entry])}
                   />
                 </TabsContent>
 
@@ -275,4 +294,4 @@ export default function HomePage() {
       <Footer />
     </div>
   );
-} 
+}
