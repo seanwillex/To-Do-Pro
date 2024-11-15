@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Task, Habit, TimeEntry, WellnessLog, WellnessMetrics, WellnessActivities } from '@/types';
 import {
   Card,
