@@ -96,19 +96,19 @@ export interface Habit {
   };
 }
 
+export type ReflectionCategory = 'learning' | 'wellness' | 'goals' | 'personal';
+export type ReflectionMood = 'positive' | 'neutral' | 'negative';
+
 export interface Reflection {
   id: number;
   title: string;
-  date: string;
   content: string;
-  mood: 'positive' | 'neutral' | 'negative';
-  learnings: string[];
-  nextSteps: string[];
-  category?: TaskCategory;
-  tags?: string[];
-  linkedGoalId?: number;
-  linkedHabitId?: number;
-  images?: string[];
+  date: string;
+  category: ReflectionCategory;
+  mood: ReflectionMood;
+  learnings?: string[];
+  nextSteps?: string[];
+  tags: string[];
 }
 
 export interface Resource {
