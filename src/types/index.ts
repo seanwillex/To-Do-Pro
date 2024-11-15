@@ -39,25 +39,6 @@ export interface Note {
   updatedAt?: string;
 }
 
-export interface Doc {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-  lastUpdated: string;
-}
-
-export interface TimeEntry {
-  id: number;
-  taskId: number;
-  title: string;
-  startTime: string;
-  endTime?: string;
-  duration: number;
-  description: string;
-  category?: TaskCategory;
-}
-
 export interface Goal {
   id: number;
   title: string;
@@ -82,37 +63,37 @@ export interface Milestone {
 
 export interface Reminder {
   id: number;
-  taskId: number;
   title: string;
   description: string;
-  dueDate: string;
-  dueTime: string;
-  status: 'pending' | 'completed' | 'dismissed' | 'all';
-  priority: 'low' | 'medium' | 'high';
-  repeat?: 'daily' | 'weekly' | 'monthly' | 'none';
+  date: string;
+  type: 'one-time' | 'recurring';
+  frequency?: 'daily' | 'weekly' | 'monthly';
+  enabled: boolean;
+  taskId: number | null;
+  completed: boolean;
+  category: string;
 }
 
 export interface Habit {
   id: number;
   title: string;
   description: string;
-  frequency: 'daily' | 'weekly' | 'monthly' | 'custom';
-  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
-  daysOfWeek?: number[]; // 0-6, where 0 is Sunday
+  frequency: 'daily' | 'weekly' | 'monthly';
+  timeOfDay: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  status: 'active' | 'inactive' | 'archived';
   streak: number;
   completedDates: string[];
-  category: TaskCategory;
+  category: string;
   created: string;
-  reminder?: {
+  reminder: {
     enabled: boolean;
     time?: string;
   };
-  progress?: {
+  progress: {
     thisWeek: number;
     thisMonth: number;
     allTime: number;
   };
-  notes?: string;
 }
 
 export interface Reflection {
@@ -168,4 +149,15 @@ export interface WellnessLog {
   activities: WellnessActivities;
   notes?: string;
   tags?: string[];
+}
+
+export interface TimeEntry {
+  id: number;
+  taskId: number | null;
+  startTime: string;
+  endTime?: string;
+  duration: number;
+  description: string;
+  category: TaskCategory;
+  date: string;
 }
