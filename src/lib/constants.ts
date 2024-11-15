@@ -1,4 +1,4 @@
-import { TaskTag, TaskCategory, Task, Note, Doc, Goal, Habit, Reflection, Resource } from '@/types';
+import { TaskTag, TaskCategory, Task, Note, Goal, Habit, Reflection, Resource, TimeEntry, Reminder } from '@/types';
 
 export const TASK_TAGS: Record<TaskTag, string> = {
   'urgent': 'bg-red-500',
@@ -72,23 +72,6 @@ export const INITIAL_NOTES: Note[] = [
   },
 ];
 
-export const INITIAL_DOCS: Doc[] = [
-  {
-    id: 1,
-    title: 'Getting Started Guide',
-    content: '<h2>Welcome to Personal Development Pro</h2><p>This guide will help you get started...</p>',
-    category: 'guide',
-    lastUpdated: new Date().toISOString()
-  },
-  {
-    id: 2,
-    title: 'Project Documentation',
-    content: '<h2>Project Overview</h2><p>Key project details and guidelines...</p>',
-    category: 'documentation',
-    lastUpdated: new Date().toISOString()
-  }
-];
-
 export const INITIAL_GOALS: Goal[] = [
   {
     id: 1,
@@ -128,6 +111,7 @@ export const INITIAL_HABITS: Habit[] = [
     description: 'Daily 15-minute meditation practice',
     frequency: 'daily',
     timeOfDay: 'morning',
+    status: 'active',
     streak: 0,
     completedDates: [],
     category: 'wellness',
@@ -171,6 +155,21 @@ export const INITIAL_RESOURCES: Resource[] = [
     priority: 'high',
     timeSpent: 0,
     tags: ['react', 'frontend', 'documentation']
+  }
+];
+
+export const INITIAL_REMINDERS: Reminder[] = [
+  {
+    id: 1,
+    title: 'Weekly Review',
+    description: 'Review goals and tasks progress',
+    date: new Date().toISOString(),
+    type: 'recurring',
+    frequency: 'weekly',
+    enabled: true,
+    taskId: null,
+    completed: false,
+    category: 'personal-development'
   }
 ];
 
