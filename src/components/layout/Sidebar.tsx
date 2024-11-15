@@ -6,10 +6,13 @@ import {
   LayoutDashboard, 
   CheckCircle2, 
   FileText, 
-  Book, 
-  Clock, 
   Target, 
-  Bell, 
+  Bell,
+  Brain,
+  Flame,
+  BookOpen,
+  HeartPulse,
+  Lightbulb
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -23,9 +26,12 @@ export function Sidebar({ sidebarOpen, activeTab = 'dashboard', onTabChange }: S
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'tasks', icon: CheckCircle2, label: 'Tasks' },
     { id: 'notes', icon: FileText, label: 'Notes' },
-    { id: 'docs', icon: Book, label: 'Docs' },
-    { id: 'time', icon: Clock, label: 'Time Tracking' },
     { id: 'goals', icon: Target, label: 'Goals' },
+    { id: 'habits', icon: Flame, label: 'Habits' },
+    { id: 'personal-dev', icon: Brain, label: 'Personal Development' },
+    { id: 'wellness', icon: HeartPulse, label: 'Wellness' },
+    { id: 'resources', icon: BookOpen, label: 'Resources' },
+    { id: 'reflections', icon: Lightbulb, label: 'Reflections' },
     { id: 'reminders', icon: Bell, label: 'Reminders' },
   ];
 
