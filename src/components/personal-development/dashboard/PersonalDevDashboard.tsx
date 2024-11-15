@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent, Progress } from "@/components/ui";
-import { Brain, Target, BookOpen, Trophy, Clock, Battery, Activity, Flame, BookOpen as BookIcon, CheckCircle2 } from 'lucide-react';
+import { Brain, Target, BookOpen, Trophy, Clock, Battery, Activity, Flame, BookOpen as BookIcon, CheckCircle2, Heart, Smile, Tag } from 'lucide-react';
 import { Task, Goal, TimeEntry, Habit, Reflection } from '@/types';
 import { format, startOfWeek, isWithinInterval, startOfDay, endOfDay, isToday } from 'date-fns';
 
@@ -14,6 +14,18 @@ interface PersonalDevDashboardProps {
   timeEntries: TimeEntry[];
 }
 
+interface WellnessMetrics {
+  completed: number;
+  total: number;
+  percentage: number;
+  goalProgress: number;
+  activeHabits: number;
+  timeSpent: number;
+  mood: number;
+  energy: number;
+  stress: number;
+}
+
 export function PersonalDevDashboard({
   tasks,
   goals,
@@ -22,7 +34,7 @@ export function PersonalDevDashboard({
   timeEntries
 }: PersonalDevDashboardProps) {
   // Calculate metrics for different categories
-  const calculateCategoryMetrics = (category: Task['category']) => {
+  const calculateCategoryMetrics = (category: Task['category']): WellnessMetrics => {
     const categoryTasks = tasks.filter(t => t.category === category);
     const completed = categoryTasks.filter(t => t.completed).length;
     const total = categoryTasks.length;
@@ -48,7 +60,10 @@ export function PersonalDevDashboard({
       percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
       goalProgress,
       activeHabits,
-      timeSpent
+      timeSpent,
+      mood: category === 'wellness' ? 4 : 0, // Default values for wellness metrics
+      energy: category === 'wellness' ? 4 : 0,
+      stress: category === 'wellness' ? 2 : 0
     };
   };
 
@@ -171,7 +186,14 @@ export function PersonalDevDashboard({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{wellnessMetrics.percentage}%</div>
-            <Progress value={wellnessMetrics.percentage} className="mt-2" />
+            <Progress 
+              value={wellnessMetrics.percentage} 
+              className={`mt-2 ${
+                wellnessMetrics.percentage >= 70 ? "bg-green-500" :
+                wellnessMetrics.percentage >= 40 ? "bg-yellow-500" :
+                "bg-red-500"
+              }`}
+            />
             <p className="text-xs text-muted-foreground mt-2">
               {wellnessMetrics.completed} wellness activities completed
             </p>
@@ -243,6 +265,96 @@ export function PersonalDevDashboard({
                   {habits.filter(h => h.streak > 0).length} habits on streak
                 </span>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Wellness and Reflection Sections */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Wellness Section */}
+        <Card className="hover-scale">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-rose-500" />
+              Wellness Tracker
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Today's Mood</span>
+                <div className="flex items-center gap-2">
+                  <Smile className="h-4 w-4 text-yellow-500" />
+                  <span className="font-medium">{wellnessMetrics.mood}/5</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Energy Level</span>
+                <div className="flex items-center gap-2">
+                  <Battery className="h-4 w-4 text-green-500" />
+                  <span className="font-medium">{wellnessMetrics.energy}/5</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Stress Level</span>
+                <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-blue-500" />
+                  <span className="font-medium">{wellnessMetrics.stress}/5</span>
+                </div>
+              </div>
+
+              <Progress 
+                value={wellnessMetrics.percentage} 
+                className={`mt-2 ${
+                  wellnessMetrics.percentage >= 70 ? "bg-green-500" :
+                  wellnessMetrics.percentage >= 40 ? "bg-yellow-500" :
+                  "bg-red-500"
+                }`}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Reflection Section */}
+        <Card className="hover-scale">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-purple-500" />
+              Recent Reflections
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {reflections.slice(-3).map((reflection) => (
+                <div 
+                  key={reflection.id} 
+                  className="flex flex-col gap-1 rounded-lg border p-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{reflection.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(reflection.date), 'MMM d')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {reflection.content}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Tag className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      {reflection.category}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {reflections.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No reflections yet. Start journaling your progress!
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
