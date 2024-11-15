@@ -136,7 +136,7 @@ export const INITIAL_REFLECTIONS: Reflection[] = [
     mood: 'positive',
     learnings: ['Started meditation practice', 'Improved focus'],
     nextSteps: ['Increase meditation duration', 'Add journaling habit'],
-    category: 'reflection',
+    category: 'personal',
     tags: ['meditation', 'productivity']
   }
 ];
