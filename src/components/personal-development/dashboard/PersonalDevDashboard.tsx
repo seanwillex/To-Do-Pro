@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent, Progress } from "@/components/ui";
-import { Brain, Target, BookOpen, Trophy, Clock, Battery, Activity, Flame, BookOpen as BookIcon } from 'lucide-react';
+import { Brain, Target, BookOpen, Trophy, Clock, Battery, Activity, Flame, BookOpen as BookIcon, CheckCircle2 } from 'lucide-react';
 import { Task, Goal, TimeEntry, Habit, Reflection } from '@/types';
 import { format, startOfWeek, isWithinInterval, startOfDay, endOfDay, isToday } from 'date-fns';
 
@@ -122,7 +122,7 @@ export function PersonalDevDashboard({
     <div className="space-y-8">
       {/* Main Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="hover-glow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Learning Progress</CardTitle>
             <Brain className="h-4 w-4 text-purple-500" />
@@ -136,7 +136,7 @@ export function PersonalDevDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover-glow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Skill Building</CardTitle>
             <Trophy className="h-4 w-4 text-yellow-500" />
@@ -150,7 +150,7 @@ export function PersonalDevDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover-glow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Activity Streak</CardTitle>
             <Flame className="h-4 w-4 text-orange-500" />
@@ -164,7 +164,7 @@ export function PersonalDevDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover-glow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Wellness Score</CardTitle>
             <Activity className="h-4 w-4 text-green-500" />
@@ -181,7 +181,7 @@ export function PersonalDevDashboard({
 
       {/* Goals and Activities */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+        <Card className="hover-scale">
           <CardHeader>
             <CardTitle>Active Goals</CardTitle>
           </CardHeader>
@@ -208,7 +208,7 @@ export function PersonalDevDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover-scale">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
