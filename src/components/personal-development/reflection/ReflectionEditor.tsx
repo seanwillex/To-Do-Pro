@@ -144,14 +144,14 @@ export function ReflectionEditor({ reflection, onUpdate }: ReflectionEditorProps
           </div>
         )}
 
-        {(reflection.linkedGoalId || reflection.linkedHabitId) && (
+        {(reflection.linkedGoalId !== undefined || reflection.linkedHabitId !== undefined) && (
           <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
-            {reflection.linkedGoalId && (
+            {reflection.linkedGoalId !== undefined && (
               <Badge variant="outline">
                 Linked to Goal #{reflection.linkedGoalId}
               </Badge>
             )}
-            {reflection.linkedHabitId && (
+            {reflection.linkedHabitId !== undefined && (
               <Badge variant="outline">
                 Linked to Habit #{reflection.linkedHabitId}
               </Badge>
