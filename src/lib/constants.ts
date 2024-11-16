@@ -18,38 +18,7 @@ export const TASK_CATEGORIES: Record<TaskCategory, string> = {
   'other': 'bg-gray-500'
 } as const;
 
-export const INITIAL_TASKS: Task[] = [
-  { 
-    id: 1, 
-    title: 'Design new landing page', 
-    completed: false, 
-    dueDate: '2024-02-15',
-    tag: 'in-progress',
-    category: 'project',
-    description: 'Create a modern and engaging landing page design',
-    tags: ['design', 'frontend']
-  },
-  { 
-    id: 2, 
-    title: 'Update user documentation', 
-    completed: true, 
-    dueDate: '2024-02-10',
-    tag: 'completed',
-    category: 'learning',
-    description: 'Review and update all user-facing documentation',
-    tags: ['documentation']
-  },
-  { 
-    id: 3, 
-    title: 'Fix authentication bugs', 
-    completed: false, 
-    dueDate: '2024-02-20',
-    tag: 'urgent',
-    category: 'project',
-    description: 'Address reported authentication issues',
-    tags: ['backend', 'security']
-  },
-];
+export const INITIAL_TASKS: Task[] = [];
 
 export const INITIAL_NOTES: Note[] = [
   { 
@@ -72,74 +41,11 @@ export const INITIAL_NOTES: Note[] = [
   },
 ];
 
-export const INITIAL_GOALS: Goal[] = [
-  {
-    id: 1,
-    title: 'Master React Development',
-    description: 'Become proficient in React and its ecosystem',
-    category: 'learning',
-    deadline: '2024-06-30',
-    progress: 60,
-    status: 'in-progress',
-    milestones: [
-      {
-        id: 1,
-        goalId: 1,
-        title: 'Complete React Basics',
-        dueDate: '2024-03-31',
-        completed: true,
-        description: 'Master fundamental React concepts'
-      },
-      {
-        id: 2,
-        goalId: 1,
-        title: 'Build Portfolio Projects',
-        dueDate: '2024-05-15',
-        completed: false,
-        description: 'Create three substantial React projects'
-      }
-    ],
-    reflections: [],
-    resources: []
-  }
-];
+export const INITIAL_GOALS: Goal[] = [];
 
-export const INITIAL_HABITS: Habit[] = [
-  {
-    id: 1,
-    title: 'Morning Meditation',
-    description: 'Daily 15-minute meditation practice',
-    frequency: 'daily',
-    timeOfDay: 'morning',
-    status: 'active',
-    streak: 0,
-    completedDates: [],
-    category: 'wellness',
-    created: new Date().toISOString(),
-    reminder: {
-      enabled: false
-    },
-    progress: {
-      thisWeek: 0,
-      thisMonth: 0,
-      allTime: 0
-    }
-  }
-];
+export const INITIAL_HABITS: Habit[] = [];
 
-export const INITIAL_REFLECTIONS: Reflection[] = [
-  {
-    id: 1,
-    title: 'Weekly Progress Review',
-    date: new Date().toISOString(),
-    content: 'Initial reflection on personal growth journey',
-    mood: 'positive',
-    learnings: ['Started meditation practice', 'Improved focus'],
-    nextSteps: ['Increase meditation duration', 'Add journaling habit'],
-    category: 'personal',
-    tags: ['meditation', 'productivity']
-  }
-];
+export const INITIAL_REFLECTIONS: Reflection[] = [];
 
 export const INITIAL_RESOURCES: Resource[] = [
   {
