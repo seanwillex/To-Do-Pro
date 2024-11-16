@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent, Progress } from "@/components/ui";
-import { Brain, Target, BookOpen, Trophy, Clock, Battery, Activity, Flame, BookOpen as BookIcon, CheckCircle2, Heart, Smile, Tag } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Progress, Badge } from "@/components/ui";
+import { Brain, Target, BookOpen, Trophy, Clock, Battery, Activity, Flame, BookOpen as BookIcon, CheckCircle2, Heart, Smile, Tag, TrendingUp, Calendar, Star } from 'lucide-react';
 import { Task, Goal, TimeEntry, Habit, Reflection } from '@/types';
 import { format, startOfWeek, isWithinInterval, startOfDay, endOfDay, isToday } from 'date-fns';
 
@@ -24,6 +24,8 @@ interface WellnessMetrics {
   mood: number;
   energy: number;
   stress: number;
+  weeklyProgress: number;
+  monthlyProgress: number;
 }
 
 export function PersonalDevDashboard({
@@ -54,6 +56,26 @@ export function PersonalDevDashboard({
       })
       .reduce((acc, entry) => acc + entry.duration, 0);
 
+    // Calculate weekly and monthly progress
+    const today = new Date();
+    const weekStart = startOfWeek(today);
+    
+    const weeklyActivities = categoryHabits
+      .filter(h => h.completedDates.some(date => 
+        isWithinInterval(new Date(date), { start: weekStart, end: today })
+      ));
+
+    const monthlyActivities = categoryHabits
+      .filter(h => h.completedDates.length > 0);
+
+    const weeklyProgress = categoryHabits.length > 0
+      ? (weeklyActivities.length / categoryHabits.length) * 100
+      : 0;
+
+    const monthlyProgress = categoryHabits.length > 0
+      ? (monthlyActivities.length / categoryHabits.length) * 100
+      : 0;
+
     return {
       completed,
       total,
@@ -61,9 +83,11 @@ export function PersonalDevDashboard({
       goalProgress,
       activeHabits,
       timeSpent,
-      mood: category === 'wellness' ? 4 : 0, // Default values for wellness metrics
+      mood: category === 'wellness' ? 4 : 0,
       energy: category === 'wellness' ? 4 : 0,
-      stress: category === 'wellness' ? 2 : 0
+      stress: category === 'wellness' ? 2 : 0,
+      weeklyProgress,
+      monthlyProgress
     };
   };
 
@@ -132,6 +156,27 @@ export function PersonalDevDashboard({
 
   // Get active goals
   const activeGoals = goals.filter(goal => goal.status === 'in-progress');
+
+  // Add new metrics calculations
+  const calculateWellnessProgress = () => {
+    const today = new Date();
+    const weekStart = startOfWeek(today);
+    
+    const weeklyActivities = habits
+      .filter(h => h.category === 'wellness')
+      .filter(h => h.completedDates.some(date => 
+        isWithinInterval(new Date(date), { start: weekStart, end: today })
+      ));
+
+    const monthlyActivities = habits
+      .filter(h => h.category === 'wellness')
+      .filter(h => h.completedDates.length > 0);
+
+    return {
+      weekly: (weeklyActivities.length / habits.filter(h => h.category === 'wellness').length) * 100,
+      monthly: (monthlyActivities.length / habits.filter(h => h.category === 'wellness').length) * 100
+    };
+  };
 
   return (
     <div className="space-y-8">
@@ -277,43 +322,93 @@ export function PersonalDevDashboard({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5 text-rose-500" />
-              Wellness Tracker
+              Wellness Overview
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Today's Mood</span>
-                <div className="flex items-center gap-2">
-                  <Smile className="h-4 w-4 text-yellow-500" />
-                  <span className="font-medium">{wellnessMetrics.mood}/5</span>
+            <div className="space-y-6">
+              {/* Daily Metrics */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Today's Mood</span>
+                  <div className="flex items-center gap-2">
+                    <Smile className="h-4 w-4 text-yellow-500" />
+                    <span className="font-medium">{wellnessMetrics.mood}/5</span>
+                  </div>
                 </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Energy Level</span>
+                  <div className="flex items-center gap-2">
+                    <Battery className="h-4 w-4 text-green-500" />
+                    <span className="font-medium">{wellnessMetrics.energy}/5</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Stress Level</span>
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-blue-500" />
+                    <span className="font-medium">{wellnessMetrics.stress}/5</span>
+                  </div>
+                </div>
+
+                <Progress 
+                  value={wellnessMetrics.percentage} 
+                  className={`mt-2 ${
+                    wellnessMetrics.percentage >= 70 ? "bg-green-500" :
+                    wellnessMetrics.percentage >= 40 ? "bg-yellow-500" :
+                    "bg-red-500"
+                  }`}
+                />
               </div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Energy Level</span>
-                <div className="flex items-center gap-2">
-                  <Battery className="h-4 w-4 text-green-500" />
-                  <span className="font-medium">{wellnessMetrics.energy}/5</span>
+
+              {/* Progress Tracking */}
+              <div className="space-y-4 pt-4 border-t">
+                <h4 className="text-sm font-medium">Progress Tracking</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Weekly</span>
+                      <Badge variant="secondary">
+                        {Math.round(wellnessMetrics.weeklyProgress)}%
+                      </Badge>
+                    </div>
+                    <Progress value={wellnessMetrics.weeklyProgress} className="h-1" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Monthly</span>
+                      <Badge variant="secondary">
+                        {Math.round(wellnessMetrics.monthlyProgress)}%
+                      </Badge>
+                    </div>
+                    <Progress value={wellnessMetrics.monthlyProgress} className="h-1" />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Stress Level</span>
-                <div className="flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-blue-500" />
-                  <span className="font-medium">{wellnessMetrics.stress}/5</span>
+              {/* Active Wellness Habits */}
+              <div className="space-y-4 pt-4 border-t">
+                <h4 className="text-sm font-medium">Active Wellness Habits</h4>
+                <div className="space-y-3">
+                  {habits
+                    .filter(h => h.category === 'wellness' && h.streak > 0)
+                    .slice(0, 3)
+                    .map(habit => (
+                      <div key={habit.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <span className="text-sm">{habit.title}</span>
+                        </div>
+                        <Badge variant="outline">{habit.streak} days</Badge>
+                      </div>
+                    ))}
+                  {habits.filter(h => h.category === 'wellness' && h.streak > 0).length === 0 && (
+                    <p className="text-sm text-muted-foreground">No active wellness habits yet.</p>
+                  )}
                 </div>
               </div>
-
-              <Progress 
-                value={wellnessMetrics.percentage} 
-                className={`mt-2 ${
-                  wellnessMetrics.percentage >= 70 ? "bg-green-500" :
-                  wellnessMetrics.percentage >= 40 ? "bg-yellow-500" :
-                  "bg-red-500"
-                }`}
-              />
             </div>
           </CardContent>
         </Card>
@@ -323,38 +418,60 @@ export function PersonalDevDashboard({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-purple-500" />
-              Recent Reflections
+              Reflection Insights
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {reflections.slice(-3).map((reflection) => (
-                <div 
-                  key={reflection.id} 
-                  className="flex flex-col gap-1 rounded-lg border p-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{reflection.title}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(reflection.date), 'MMM d')}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {reflection.content}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Tag className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      {reflection.category}
-                    </span>
-                  </div>
+            <div className="space-y-6">
+              {/* Reflection Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <span className="text-2xl font-bold">{reflections.length}</span>
+                  <p className="text-xs text-muted-foreground">Total Entries</p>
                 </div>
-              ))}
-              {reflections.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No reflections yet. Start journaling your progress!
-                </p>
-              )}
+                <div className="space-y-1">
+                  <span className="text-2xl font-bold">{recentReflections.thisWeek}</span>
+                  <p className="text-xs text-muted-foreground">This Week</p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-2xl font-bold">
+                    {new Set(reflections.map(r => r.category)).size}
+                  </span>
+                  <p className="text-xs text-muted-foreground">Categories</p>
+                </div>
+              </div>
+
+              {/* Recent Reflections */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Recent Reflections</h4>
+                {reflections.slice(-3).map((reflection) => (
+                  <div 
+                    key={reflection.id} 
+                    className="flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(reflection.date), 'MMM d')}
+                        </span>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        {reflection.category}
+                      </Badge>
+                    </div>
+                    <p className="text-sm font-medium">{reflection.title}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {reflection.content}
+                    </p>
+                  </div>
+                ))}
+                {reflections.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    No reflections yet. Start journaling your thoughts!
+                  </p>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
