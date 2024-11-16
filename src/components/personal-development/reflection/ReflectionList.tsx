@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Reflection, TaskCategory } from '@/types';
+import { Reflection, ReflectionCategory, ReflectionMood } from '@/types';
 import { 
   Card, 
   CardContent,
@@ -26,8 +26,7 @@ import { format } from 'date-fns';
 
 interface ReflectionListProps {
   reflections: Reflection[];
-  setReflections: React.Dispatch<React.SetStateAction<Reflection[]>>;
-  updateReflection: (id: number, updates: Partial<Reflection>) => void;
+  onUpdate: (reflections: Reflection[]) => void;
 }
 
 const MOOD_OPTIONS = [
@@ -36,7 +35,7 @@ const MOOD_OPTIONS = [
   { value: 'negative', label: 'Negative 😔' }
 ] as const;
 
-const CATEGORIES: TaskCategory[] = [
+const CATEGORIES: ReflectionCategory[] = [
   'learning',
   'wellness',
   'skill-building',
@@ -45,25 +44,75 @@ const CATEGORIES: TaskCategory[] = [
   'other'
 ];
 
-export function ReflectionList({ reflections, setReflections, updateReflection }: ReflectionListProps) {
+export function ReflectionList({ reflections, onUpdate }: ReflectionListProps) {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [filter, setFilter] = React.useState<TaskCategory | 'all'>('all');
-  const [newReflection, setNewReflection] = React.useState<Partial<Reflection>>({
+  const [filter, setFilter] = React.useState<ReflectionCategory | 'all'>('all');
+  const [newReflection, setNewReflection] = React.useState<Omit<Reflection, 'id'>>({
     title: '',
     content: '',
     mood: 'neutral',
     learnings: [],
     nextSteps: [],
-    category: 'reflection',
+    category: 'learning',
     date: new Date().toISOString(),
     tags: []
   });
+
+  const filteredReflections = React.useMemo(() => {
+    if (filter === 'all') {
+      return reflections;
+    }
+    return reflections.filter(reflection => reflection.category === filter);
+  }, [reflections, filter]);
+
+  const sortedReflections = React.useMemo(() => {
+    return [...filteredReflections].sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }, [filteredReflections]);
+
+  const handleSubmit = () => {
+    if (newReflection.title && newReflection.content) {
+      const reflection: Reflection = {
+        id: Date.now(),
+        title: newReflection.title,
+        content: newReflection.content,
+        date: newReflection.date,
+        category: newReflection.category,
+        mood: newReflection.mood,
+        learnings: newReflection.learnings,
+        nextSteps: newReflection.nextSteps,
+        tags: newReflection.tags
+      };
+
+      onUpdate([...reflections, reflection]);
+      setIsDialogOpen(false);
+      setNewReflection({
+        title: '',
+        content: '',
+        mood: 'neutral',
+        learnings: [],
+        nextSteps: [],
+        category: 'learning',
+        date: new Date().toISOString(),
+        tags: []
+      });
+    }
+  };
 
   const addNewLearning = () => {
     setNewReflection(prev => ({
       ...prev,
       learnings: [...(prev.learnings || []), '']
     }));
+  };
+
+  const updateLearning = (index: number, value: string) => {
+    setNewReflection(prev => {
+      const learnings = [...(prev.learnings || [])];
+      learnings[index] = value;
+      return { ...prev, learnings };
+    });
   };
 
   const addNewNextStep = () => {
@@ -73,58 +122,20 @@ export function ReflectionList({ reflections, setReflections, updateReflection }
     }));
   };
 
-  const updateLearning = (index: number, value: string) => {
-    setNewReflection(prev => ({
-      ...prev,
-      learnings: prev.learnings?.map((item, i) => i === index ? value : item) || []
-    }));
-  };
-
   const updateNextStep = (index: number, value: string) => {
-    setNewReflection(prev => ({
-      ...prev,
-      nextSteps: prev.nextSteps?.map((item, i) => i === index ? value : item) || []
-    }));
+    setNewReflection(prev => {
+      const nextSteps = [...(prev.nextSteps || [])];
+      nextSteps[index] = value;
+      return { ...prev, nextSteps };
+    });
   };
 
-  const handleSubmit = () => {
-    if (newReflection.title && newReflection.content) {
-      const reflection: Reflection = {
-        id: Date.now(),
-        title: newReflection.title,
-        date: new Date().toISOString(),
-        content: newReflection.content,
-        mood: newReflection.mood || 'neutral',
-        learnings: newReflection.learnings || [],
-        nextSteps: newReflection.nextSteps || [],
-        category: newReflection.category || 'reflection',
-        tags: newReflection.tags || []
-      };
-
-      setReflections(prev => [...prev, reflection]);
-      setIsDialogOpen(false);
-      setNewReflection({
-        title: '',
-        content: '',
-        mood: 'neutral',
-        learnings: [],
-        nextSteps: [],
-        category: 'reflection',
-        tags: []
-      });
-    }
+  const handleReflectionUpdate = (updatedReflection: Partial<Reflection>) => {
+    const updatedReflections = reflections.map(r => 
+      r.id === updatedReflection.id ? { ...r, ...updatedReflection } : r
+    );
+    onUpdate(updatedReflections);
   };
-
-  const filteredReflections = React.useMemo(() => {
-    return filter === 'all'
-      ? reflections
-      : reflections.filter(r => r.category === filter);
-  }, [reflections, filter]);
-
-  // Sort reflections by date (newest first)
-  const sortedReflections = [...filteredReflections].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
 
   return (
     <div className="space-y-6">
@@ -154,7 +165,7 @@ export function ReflectionList({ reflections, setReflections, updateReflection }
                 <Label>Category</Label>
                 <Select
                   value={newReflection.category}
-                  onValueChange={(value: TaskCategory) =>
+                  onValueChange={(value: ReflectionCategory) =>
                     setNewReflection(prev => ({ ...prev, category: value }))
                   }
                 >
@@ -175,7 +186,7 @@ export function ReflectionList({ reflections, setReflections, updateReflection }
                 <Label>Mood</Label>
                 <Select
                   value={newReflection.mood}
-                  onValueChange={(value: Reflection['mood']) =>
+                  onValueChange={(value: ReflectionMood) =>
                     setNewReflection(prev => ({ ...prev, mood: value }))
                   }
                 >
@@ -244,7 +255,7 @@ export function ReflectionList({ reflections, setReflections, updateReflection }
 
         <Select
           value={filter}
-          onValueChange={(value: TaskCategory | 'all') => setFilter(value)}
+          onValueChange={(value: ReflectionCategory | 'all') => setFilter(value)}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by category" />
@@ -265,7 +276,7 @@ export function ReflectionList({ reflections, setReflections, updateReflection }
           <ReflectionEditor
             key={reflection.id}
             reflection={reflection}
-            onUpdate={(updates) => updateReflection(reflection.id, updates)}
+            onUpdate={handleReflectionUpdate}
           />
         ))}
         {sortedReflections.length === 0 && (
