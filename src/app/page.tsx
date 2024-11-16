@@ -221,11 +221,12 @@ export default function Home() {
                 updateResource={updateResource} 
               />
             )}
-            {activeTab === 'reflections' && (
+            {activeTab === 'reflection' && (
               <ReflectionList 
-                reflections={reflections} 
-                setReflections={setReflections} 
-                updateReflection={updateReflection} 
+                reflections={reflections}
+                onUpdate={(updatedReflections) => {
+                  setReflections(updatedReflections);
+                }}
               />
             )}
             {activeTab === 'reminders' && (
