@@ -96,7 +96,7 @@ export interface Habit {
   };
 }
 
-export type ReflectionCategory = 'learning' | 'wellness' | 'goals' | 'personal';
+export type ReflectionCategory = 'learning' | 'wellness' | 'skill-building' | 'habits' | 'reading' | 'other';
 export type ReflectionMood = 'positive' | 'neutral' | 'negative';
 
 export interface Reflection {
@@ -106,9 +106,11 @@ export interface Reflection {
   date: string;
   category: ReflectionCategory;
   mood: ReflectionMood;
-  learnings?: string[];
-  nextSteps?: string[];
+  learnings: string[];
+  nextSteps: string[];
   tags: string[];
+  linkedGoalId?: number;
+  linkedHabitId?: number;
 }
 
 export interface Resource {
